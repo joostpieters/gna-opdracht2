@@ -1,11 +1,13 @@
 package gna;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import libpract.PriorityFunc;
 
 public class Solver
 {
+	Collection<Board> coBoards;
 	/**
 	 * Finds a solution to the initial board.
 	 *
@@ -13,10 +15,11 @@ public class Solver
 	 */
 	public Solver(Board initial, PriorityFunc priority)
 	{
+		coBoards = new ArrayList<Board>();
 		// Use the given priority function (either PriorityFunc.HAMMING
 		// or PriorityFunc.MANHATTAN) to solve the puzzle.
 		if (priority == PriorityFunc.HAMMING) {
-			// TODO
+
 		} else if (priority == PriorityFunc.MANHATTAN) {
 			// TODO
 		} else {

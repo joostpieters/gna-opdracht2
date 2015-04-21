@@ -7,6 +7,7 @@ import java.util.Iterator;
 public class Board
 {
 	private int[][] iaSpel;
+	private int iSprongen;
 	// construct a board from an N-by-N array of tiles
 	public Board( int[][] tiles ){
 		iaSpel = tiles;
@@ -57,23 +58,27 @@ public class Board
 		int[] iaNull = fncFindLoc(0);
 		if (iaNull[0] != iaSpel.length){
 			// een rechter buur
-			int[][] iaNeighbour = fncSwitch(iaSpel,1,0);
-			idxCollection.add(new Board(iaNeighbour));
+			Board iaNeighbour = new Board(fncSwitch(iaSpel,1,0));
+			iaNeighbour.setSprongen(getSprongen() + 1);
+			idxCollection.add(iaNeighbour);
 		}
 		if (iaNull[0] != 0){
 			//een linker buur
-			int[][] iaNeighbour = fncSwitch(iaSpel,-1,0);
-			idxCollection.add(new Board(iaNeighbour));
+			Board iaNeighbour = new Board(fncSwitch(iaSpel,-1,0));
+			iaNeighbour.setSprongen(getSprongen() + 1);
+			idxCollection.add(iaNeighbour);
 		}
 		if (iaNull[1] != iaSpel.length){
 			//een onder buur
-			int[][] iaNeighbour = fncSwitch(iaSpel,0,-1);
-			idxCollection.add(new Board(iaNeighbour));
+			Board iaNeighbour = new Board(fncSwitch(iaSpel,0,-1));
+			iaNeighbour.setSprongen(getSprongen() + 1);
+			idxCollection.add(iaNeighbour);
 		}
 		if(iaNull[1] != 0){
 			//een boven buur
-			int[][] iaNeighbour = fncSwitch(iaSpel,0,1);
-			idxCollection.add(new Board(iaNeighbour));
+			Board iaNeighbour = new Board(fncSwitch(iaSpel,0,1));
+			iaNeighbour.setSprongen(getSprongen() + 1);
+			idxCollection.add(iaNeighbour);
 		}
 
 		return idxCollection;
@@ -148,5 +153,15 @@ public class Board
 		}
 		return -1;
 	}
+
+	//getters en setters iSprongen
+	void setSprongen (int iTemp){
+		iSprongen = Math.abs(iTemp);
+	}
+
+	int getSprongen(){
+	return iSprongen;
+	}
+
 }
 
