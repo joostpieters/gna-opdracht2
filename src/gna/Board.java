@@ -57,30 +57,22 @@ public class Board
 		int[] iaNull = fncFindLoc(0);
 		if (iaNull[0] != iaSpel.length){
 			// een rechter buur
-			int[][] iaNeighbour = iaSpel;
-			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]+1][iaNull[1]];
-			iaNeighbour[iaNull[0]+1][iaNull[1]] = 0;
+			int[][] iaNeighbour = fncSwitch(iaSpel,1,0);
 			idxCollection.add(new Board(iaNeighbour));
 		}
 		if (iaNull[0] != 0){
 			//een linker buur
-			int[][] iaNeighbour = iaSpel;
-			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]-1][iaNull[1]];
-			iaNeighbour[iaNull[0]-1][iaNull[1]] = 0;
+			int[][] iaNeighbour = fncSwitch(iaSpel,-1,0);
 			idxCollection.add(new Board(iaNeighbour));
 		}
 		if (iaNull[1] != iaSpel.length){
 			//een onder buur
-			int[][] iaNeighbour = iaSpel;
-			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]][iaNull[1]-1];
-			iaNeighbour[iaNull[0]][iaNull[1]-1] = 0;
+			int[][] iaNeighbour = fncSwitch(iaSpel,0,-1);
 			idxCollection.add(new Board(iaNeighbour));
 		}
 		if(iaNull[1] != 0){
 			//een boven buur
-			int[][] iaNeighbour = iaSpel;
-			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]][iaNull[1]+1];
-			iaNeighbour[iaNull[0]][iaNull[1]+1] = 0;
+			int[][] iaNeighbour = fncSwitch(iaSpel,0,1);
 			idxCollection.add(new Board(iaNeighbour));
 		}
 
@@ -102,7 +94,7 @@ public class Board
 	// is the initial board solvable?
 	public boolean isSolvable()
 	{
-		while (iaSpel[iaSpel.length][iaSpel.length] != 0){
+		while (iaSpel[iaSpel.length-1][iaSpel.length-1] != 0){
 			if (fncFindLoc(0)[0] != iaSpel.length ){
 				iaSpel = fncSwitch(iaSpel,-1,0);
 			}

@@ -39,21 +39,22 @@ public class UnitTests {
       }
     }
     //omzetting naar int[]
-    int[] iaTemp = new int[strTemp.length()];
-    for (int i = 0; i < strTemp.length();i++){
-     iaTemp[i] = Integer.parseInt(strTemp.split("")[i]);
+    int[] iaTemp = new int[strTemp.replaceAll("\\s+","").length()];
+    String[] straTemp = strTemp.split(" ");
+    for (int i = 1; i < straTemp.length;i += 2){
+     iaTemp[(int)i/2] = Integer.parseInt((straTemp)[i]);
     }
 
     //omzetting naar int[][]
     int[][] iaaTemp = new int[iaTemp[0]][iaTemp[0]];
     for(int i = 1; i < iaTemp.length; i++){
-      iaaTemp[(int)(i / iaTemp[0])][i % iaTemp[0]] = iaTemp[i];
+      iaaTemp[(int)((i-1) / iaTemp[0])][(i-1) % iaTemp[0]] = iaTemp[i];
     }
   return iaaTemp;
   }
   @Test
   public void IsSolvableTest() {
-		int[][] iaSpel = fncBoardReader("./board/puzzle3x3-impossible.txt");
+		int[][] iaSpel = fncBoardReader("/home/covert/code/gna/gna-opdracht2/boards/puzzle3x3-impossible.txt");
         Board SpelBord = new Board(iaSpel);
         assertEquals(false, SpelBord.isSolvable());
   }
