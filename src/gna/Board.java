@@ -8,28 +8,31 @@ public class Board
 {
 	private int[][] iaSpel;
 	// construct a board from an N-by-N array of tiles
-	public Board( int[][] tiles )
-	{
+	public Board( int[][] tiles ){
 		iaSpel = tiles;
 		//throw new RuntimeException("not implemented"); // TODO
 	}
 	
 	// return number of blocks out of place
-	public int hamming()
-	{
-		throw new RuntimeException("not implemented"); // TODO
+	public int hamming(){
+		int iCounter = 0;
+		for(int x = 0; x < iaSpel.length; x++){
+			for (int y = 0; y < iaSpel.length; y++){
+				if (iaSpel[x][y] != (x * iaSpel.length + y)){
+					iCounter++;
+				}
+			}
+		}
+		return iCounter;
 	}
 	
 	// return sum of Manhattan distances between blocks and goal
 	public int manhattan()
 	{
 		int iCounter = 0;
-		for(int x; x < iaSpel.length; x++)
-		{
-			for(int y; y < iaSpel.length; y++)
-			{
-				if(iaSpel[x][y] == (x*iaSpel.length + y))
-				{
+		for(int x = 0; x < iaSpel.length; x++){
+			for(int y = 0; y < iaSpel.length; y++){
+				if(iaSpel[x][y] == (x*iaSpel.length + y)){
 						continue;
 					} else {
 						iCounter += Math.abs((iaSpel[x][y] / iaSpel.length) - x);
@@ -52,36 +55,32 @@ public class Board
 		Collection<Board> idxCollection = new ArrayList<Board>();
 
 		int[] iaNull = fncFindLoc(0);
-		if (iaNull[0] != iaSpel.length)
-		{
+		if (iaNull[0] != iaSpel.length){
 			// een rechter buur
 			int[][] iaNeighbour = iaSpel;
 			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]+1][iaNull[1]];
-			iaNeighbour[iaNull[0+1]][iaNull[1]] = 0;
+			iaNeighbour[iaNull[0]+1][iaNull[1]] = 0;
 			idxCollection.add(new Board(iaNeighbour));
 		}
-		if (iaNull[0] != 0)
-		{
+		if (iaNull[0] != 0){
 			//een linker buur
 			int[][] iaNeighbour = iaSpel;
 			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]-1][iaNull[1]];
-			iaNeighbour[iaNull[0-1]][iaNull[1]] = 0;
+			iaNeighbour[iaNull[0]-1][iaNull[1]] = 0;
 			idxCollection.add(new Board(iaNeighbour));
 		}
-		if (iaNull[1] != iaSpel.length)
-		{
+		if (iaNull[1] != iaSpel.length){
 			//een onder buur
 			int[][] iaNeighbour = iaSpel;
-			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]][iaNull[1-1]];
-			iaNeighbour[iaNull[0]][iaNull[1-1]] = 0;
+			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]][iaNull[1]-1];
+			iaNeighbour[iaNull[0]][iaNull[1]-1] = 0;
 			idxCollection.add(new Board(iaNeighbour));
 		}
-		if(iaNull[1] != 0)
-		{
+		if(iaNull[1] != 0){
 			//een boven buur
 			int[][] iaNeighbour = iaSpel;
-			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]][iaNull[1+1]];
-			iaNeighbour[iaNull[0]][iaNull[1+1]] = 0;
+			iaNeighbour[iaNull[0]][iaNull[1]] = iaNeighbour[iaNull[0]][iaNull[1]+1];
+			iaNeighbour[iaNull[0]][iaNull[1]+1] = 0;
 			idxCollection.add(new Board(iaNeighbour));
 		}
 
@@ -91,28 +90,71 @@ public class Board
 	// return a string representation of the board
 	public String toString()
 	{
-		return "<empty>"; // TODO
+		String strOutput="";
+		for(int x = 0; x < iaSpel.length; x++){
+			for(int y = 0; y < iaSpel.length; y++){
+				strOutput += iaSpel[x][y];
+			}
+		}
+		return strOutput;
 	}
 
 	// is the initial board solvable?
 	public boolean isSolvable()
 	{
-		throw new RuntimeException("not implemented"); // TODO
-	}
+		while (iaSpel[iaSpel.length][iaSpel.length] != 0){
+			if (fncFindLoc(0)[0] != iaSpel.length ){
+				iaSpel = fncSwitch(iaSpel,-1,0);
+			}
+			if(fncFindLoc(0)[1] != iaSpel.length){
+				iaSpel = fncSwitch(iaSpel,0,-1);
 
+			}
+		}
+		//één dim array
+		int[] iaTemp = new int[(int) Math.pow(iaSpel.length,2)];
+		for(int x = 0; x < iaSpel.length; x++){
+			for (int y = 0; y < iaSpel.length; y++){
+				iaTemp[x*iaSpel.length + y] = iaSpel[x][y];
+			}
+		}
+		//formule toepassen
+			//lijst itereren
+		int iTeller = 1 ,iNoemer = 1;
+		for(int i = 0; i < iaTemp.length - 1; i++) {
+			for (int j = i + 1 ; j < iaTemp.length; j++){
+				iTeller *= fncSingleFind(iaTemp, j) - fncSingleFind(iaTemp, i);
+				iNoemer *= j - i;
+			}
+		}
+		return (iTeller/iNoemer > 0);
+	}
+	//nominaal uitgewerkt
+	private int[][] fncSwitch(int[][] iaTemp, int iX, int iY)
+	{
+		int[] iaNull = fncFindLoc(0);
+		iaTemp[iaNull[0]][iaNull[1]] = iaTemp[iaNull[0] + iX][iaNull[1] + iY];
+		iaTemp[iaNull[0] + iX][iaNull[1] + iY] = 0;
+		return iaTemp;
+	}
 	private int[] fncFindLoc(int iFind)
 	{
-		for(int x; x < iaSpel.length; x++)
-		{
-			for (int y; y < iaSpel.length; y++)
-			{
-				if (iaSpel[x][y] == iFind)
-				{
-					int[] iaReturn = {x,y};
+		for(int x = 0; x < iaSpel.length; x++){
+			for (int y = 0; y < iaSpel.length; y++){
+				if (iaSpel[x][y] == iFind){
+					return new int[]{x,y};
 				}
 			}
 		}
-		return iaReturn;
+		return null;
+	}
+	private int fncSingleFind(int[] iaTemp, int iFind){
+		for(int i = 0; i< iaTemp.length;i++){
+			if(iaTemp[i] == iFind){
+				return i;
+			}
+		}
+		return -1;
 	}
 }
 
