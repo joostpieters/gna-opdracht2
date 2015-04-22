@@ -1,13 +1,16 @@
 package gna;
 
+import libpract.PriorityFunc;
+import org.junit.Test;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import libpract.PriorityFunc;
+import java.util.List;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  * A number of JUnit tests for Solver.
@@ -18,7 +21,7 @@ public class UnitTests {
   //http://www.mkyong.com/java/how-to-read-file-from-java-bufferedreader-example/
   private int[][] fncBoardReader(String strPath){
     BufferedReader br = null;
-    String strTemp = "";
+    List<Integer> lstTemp = new ArrayList<Integer>();
     try {
 
       String sCurrentLine;
@@ -26,11 +29,16 @@ public class UnitTests {
       br = new BufferedReader(new FileReader(strPath));
 
       while ((sCurrentLine = br.readLine()) != null) {
-        strTemp += " " + sCurrentLine;
+        String[] strs = sCurrentLine.trim().split("\\s+");
+        for (int i = 0; i < strs.length; i++) {
+          lstTemp.add(Integer.parseInt(strs[i]));
+        }
       }
 
     } catch (IOException e) {
       e.printStackTrace();
+    } catch (NumberFormatException e) {
+
     } finally {
       try {
         if (br != null)br.close();
@@ -39,23 +47,27 @@ public class UnitTests {
       }
     }
     //omzetting naar int[]
-    int[] iaTemp = new int[strTemp.replaceAll("\\s+","").length()];
-    String[] straTemp = strTemp.split(" ");
-    for (int i = 1; i < straTemp.length;i += 2){
-     iaTemp[(int)i/2] = Integer.parseInt((straTemp)[i]);
+    int iCounter = -1, iWidth = (int) Math.sqrt(lstTemp.size() - 1);
+    int[][] iaaTemp = new int[iWidth][iWidth];
+    for (Integer iTemp : lstTemp) {
+      if (iCounter != -1)
+        iaaTemp[(iCounter / iWidth)][(iCounter % iWidth)] = iTemp;
+      iCounter++;
     }
 
-    //omzetting naar int[][]
-    int[][] iaaTemp = new int[iaTemp[0]][iaTemp[0]];
-    for(int i = 1; i < iaTemp.length; i++){
-      iaaTemp[(int)((i-1) / iaTemp[0])][(i-1) % iaTemp[0]] = iaTemp[i];
-    }
-  return iaaTemp;
+
+    return iaaTemp;
   }
   @Test
   public void IsSolvableTest() {
 		int[][] iaSpel = fncBoardReader("/home/covert/code/gna/gna-opdracht2/boards/puzzle3x3-impossible.txt");
         Board SpelBord = new Board(iaSpel);
         assertEquals(false, SpelBord.isSolvable());
+  }
+
+  @Test
+  public void SolverTest() {
+    Solver solver = new Solver(new Board(fncBoardReader("/home/covert/code/gna/gna-opdracht2/boards/puzzle32.txt")), PriorityFunc.HAMMING);
+    Collection<Board> temp = solver.solution();
   }
 }

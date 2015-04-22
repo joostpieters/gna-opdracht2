@@ -2,7 +2,6 @@ package gna;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 public class Board
 {
@@ -19,8 +18,9 @@ public class Board
 		int iCounter = 0;
 		for(int x = 0; x < iaSpel.length; x++){
 			for (int y = 0; y < iaSpel.length; y++){
-				if (iaSpel[x][y] != (x * iaSpel.length + y)){
-					iCounter++;
+				if (iaSpel[x][y] != (x * iaSpel.length + y) + 1) {
+					if (iaSpel[x][y] != 0)
+						iCounter++;
 				}
 			}
 		}
@@ -33,7 +33,7 @@ public class Board
 		int iCounter = 0;
 		for(int x = 0; x < iaSpel.length; x++){
 			for(int y = 0; y < iaSpel.length; y++){
-				if(iaSpel[x][y] == (x*iaSpel.length + y)){
+				if ((iaSpel[x][y] == (x * iaSpel.length + y)) && (iaSpel[x][y] != 0)) {
 						continue;
 					} else {
 						iCounter += Math.abs((iaSpel[x][y] / iaSpel.length) - x);
@@ -56,7 +56,7 @@ public class Board
 		Collection<Board> idxCollection = new ArrayList<Board>();
 
 		int[] iaNull = fncFindLoc(0);
-		if (iaNull[0] != iaSpel.length){
+		if (iaNull[0] != iaSpel.length - 1) {
 			// een rechter buur
 			Board iaNeighbour = new Board(fncSwitch(iaSpel,1,0));
 			iaNeighbour.setSprongen(getSprongen() + 1);
@@ -68,15 +68,15 @@ public class Board
 			iaNeighbour.setSprongen(getSprongen() + 1);
 			idxCollection.add(iaNeighbour);
 		}
-		if (iaNull[1] != iaSpel.length){
+		if (iaNull[1] != iaSpel.length - 1) {
 			//een onder buur
-			Board iaNeighbour = new Board(fncSwitch(iaSpel,0,-1));
+			Board iaNeighbour = new Board(fncSwitch(iaSpel, 0, 1));
 			iaNeighbour.setSprongen(getSprongen() + 1);
 			idxCollection.add(iaNeighbour);
 		}
 		if(iaNull[1] != 0){
 			//een boven buur
-			Board iaNeighbour = new Board(fncSwitch(iaSpel,0,1));
+			Board iaNeighbour = new Board(fncSwitch(iaSpel, 0, -1));
 			iaNeighbour.setSprongen(getSprongen() + 1);
 			idxCollection.add(iaNeighbour);
 		}
@@ -90,8 +90,9 @@ public class Board
 		String strOutput="";
 		for(int x = 0; x < iaSpel.length; x++){
 			for(int y = 0; y < iaSpel.length; y++){
-				strOutput += iaSpel[x][y];
+				strOutput += " " + iaSpel[x][y];
 			}
+			strOutput += "\n";
 		}
 		return strOutput;
 	}
@@ -99,12 +100,12 @@ public class Board
 	// is the initial board solvable?
 	public boolean isSolvable()
 	{
-		while (iaSpel[iaSpel.length-1][iaSpel.length-1] != 0){
-			if (fncFindLoc(0)[0] != iaSpel.length ){
-				iaSpel = fncSwitch(iaSpel,-1,0);
+		while (iaSpel[iaSpel.length - 1][iaSpel.length - 1] != 0) {
+			if (fncFindLoc(0)[0] != iaSpel.length - 1) {
+				iaSpel = fncSwitch(iaSpel, 1, 0);
 			}
-			if(fncFindLoc(0)[1] != iaSpel.length){
-				iaSpel = fncSwitch(iaSpel,0,-1);
+			if (fncFindLoc(0)[1] != iaSpel.length - 1) {
+				iaSpel = fncSwitch(iaSpel, 0, 1);
 
 			}
 		}
@@ -119,20 +120,40 @@ public class Board
 			//lijst itereren
 		int iTeller = 1 ,iNoemer = 1;
 		for(int i = 0; i < iaTemp.length - 1; i++) {
-			for (int j = i + 1 ; j < iaTemp.length; j++){
+			for (int j = i + 1; j < iaTemp.length - 1; j++) {
 				iTeller *= fncSingleFind(iaTemp, j) - fncSingleFind(iaTemp, i);
 				iNoemer *= j - i;
+
+				if (iNoemer > 0) {
+					iNoemer = 1;
+				} else {
+					iNoemer = -1;
+				}
+				if (iTeller > 0) {
+					iTeller = 1;
+				} else {
+					iTeller = -1;
+				}
+
 			}
 		}
-		return (iTeller/iNoemer > 0);
+		return (iTeller / iNoemer < 0);
 	}
 	//nominaal uitgewerkt
 	private int[][] fncSwitch(int[][] iaTemp, int iX, int iY)
 	{
+		int[][] iaNew = new int[iaTemp.length][iaTemp.length];
+		for (int x = 0; x < iaSpel.length; x++) {
+			for (int y = 0; y < iaSpel.length; y++) {
+				int i = iaTemp[x][y];
+				iaNew[x][y] = i;
+			}
+		}
+
 		int[] iaNull = fncFindLoc(0);
-		iaTemp[iaNull[0]][iaNull[1]] = iaTemp[iaNull[0] + iX][iaNull[1] + iY];
-		iaTemp[iaNull[0] + iX][iaNull[1] + iY] = 0;
-		return iaTemp;
+		iaNew[iaNull[0]][iaNull[1]] = iaNew[iaNull[0] + iX][iaNull[1] + iY];
+		iaNew[iaNull[0] + iX][iaNull[1] + iY] = 0;
+		return iaNew;
 	}
 	private int[] fncFindLoc(int iFind)
 	{
@@ -154,14 +175,17 @@ public class Board
 		return -1;
 	}
 
+	int getSprongen() {
+		return iSprongen;
+	}
+
 	//getters en setters iSprongen
 	void setSprongen (int iTemp){
 		iSprongen = Math.abs(iTemp);
 	}
 
-	int getSprongen(){
-	return iSprongen;
+	int[][] getIaSpel() {
+		return iaSpel;
 	}
-
 }
 
